@@ -1,0 +1,1516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>past.fm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ── Tokens. Colour lives only here. Light, then dark (system), then the two explicit choices. ── */
+:root{
+ --bg:#f4f1ea; --panel:#fff; --sunk:#ece8e0; --ink:#1c1b1a; --ink2:#615d56;
+ --line:#d9d4ca; --edge:#86827a; --accent:#e60012; --accent-deep:#9b000c; --on-accent:#fff;
+ --focus:#1c1b1a; --link:#0a6cd8;
+ --heat0:#ece8e0; --heat1:#ffe27a; --heat2:#c8eb94; --heat3:#45bb86; --heat4:#0f6f66;
+ --heat-ink:#1c1b1a; --heat-ink-hi:#fff; --heat3-ink:#1c1b1a;
+ --t1:#ffd23f; --t2:#4cc3ff; --t3:#86dc72; --t4:#ff94c8; --t5:#bba4ff; --tile-ink:#1c1b1a;
+ --shadow:0 1px 2px rgba(28,27,26,.05),0 8px 22px rgba(28,27,26,.06);
+ --scrim:rgba(20,19,18,.55); --vinyl:#1c1b1a; --eye:#fff; --pupil:#1c1b1a;
+ --r:18px; --bar:#1d9a7a;
+
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --bg:#1c1915; --panel:#26221d; --sunk:#332e27; --ink:#f0e6d4; --ink2:#c2b5a0;
+ --line:#3e382f; --edge:#8f8371; --accent:#ff7a5c; --accent-deep:#b0442e; --on-accent:#200a04;
+ --focus:#f0e6d4; --link:#8cc4ff;
+ --heat0:#332e27; --heat1:#47432a; --heat2:#4e662b; --heat3:#3fa476; --heat4:#a6ebc6;
+ --heat-ink:#f0e6d4; --heat-ink-hi:#1c1915; --heat3-ink:#1c1915;
+ --t1:#e9c450; --t2:#6bb8e2; --t3:#93cc7f; --t4:#ec97bf; --t5:#b3a1ea; --tile-ink:#1c1915;
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.3);
+ --scrim:rgba(12,10,7,.7); --vinyl:#0f0d0a; --eye:#fff; --pupil:#0f0d0a; --bar:#5fd0a0;
+}}
+:root[data-theme=light]{
+ --bg:#f4f1ea; --panel:#fff; --sunk:#ece8e0; --ink:#1c1b1a; --ink2:#615d56;
+ --line:#d9d4ca; --edge:#86827a; --accent:#e60012; --accent-deep:#9b000c; --on-accent:#fff;
+ --focus:#1c1b1a; --link:#0a6cd8;
+ --heat0:#ece8e0; --heat1:#ffe27a; --heat2:#c8eb94; --heat3:#45bb86; --heat4:#0f6f66;
+ --heat-ink:#1c1b1a; --heat-ink-hi:#fff; --heat3-ink:#1c1b1a;
+ --t1:#ffd23f; --t2:#4cc3ff; --t3:#86dc72; --t4:#ff94c8; --t5:#bba4ff; --tile-ink:#1c1b1a;
+ --shadow:0 1px 2px rgba(28,27,26,.05),0 8px 22px rgba(28,27,26,.06);
+ --scrim:rgba(20,19,18,.55); --vinyl:#1c1b1a; --eye:#fff; --pupil:#1c1b1a; --bar:#1d9a7a;
+
+}
+:root[data-theme=dark]{
+ --bg:#1c1915; --panel:#26221d; --sunk:#332e27; --ink:#f0e6d4; --ink2:#c2b5a0;
+ --line:#3e382f; --edge:#8f8371; --accent:#ff7a5c; --accent-deep:#b0442e; --on-accent:#200a04;
+ --focus:#f0e6d4; --link:#8cc4ff;
+ --heat0:#332e27; --heat1:#47432a; --heat2:#4e662b; --heat3:#3fa476; --heat4:#a6ebc6;
+ --heat-ink:#f0e6d4; --heat-ink-hi:#1c1915; --heat3-ink:#1c1915;
+ --t1:#e9c450; --t2:#6bb8e2; --t3:#93cc7f; --t4:#ec97bf; --t5:#b3a1ea; --tile-ink:#1c1915;
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.3);
+ --scrim:rgba(12,10,7,.7); --vinyl:#0f0d0a; --eye:#fff; --pupil:#0f0d0a; --bar:#5fd0a0;
+
+}
+
+/* ── Base ── */
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:16px/1.6 "Atkinson Hyperlegible Next","Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
+ -webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px}
+h1,h2,h3{margin:0;letter-spacing:-.01em}
+h2{font-size:19px;font-weight:800}
+h3{font-size:14px;font-weight:800;color:var(--ink2);letter-spacing:.02em}
+a{color:var(--link)}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.muted{color:var(--ink2)}
+.small{font-size:13.5px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 80px}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:22px;align-items:start}
+/* The sidebar stays in view while you scroll, and scrolls on its own when it is taller than the
+   window, so the bottom of Filters is always reachable. The padding keeps shadows and focus rings visible. */
+.aside{position:sticky;top:18px;display:grid;gap:16px;align-content:start;
+ max-height:calc(100vh - 36px);max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain;
+ padding:4px 8px 12px;margin:-4px -8px -12px;scrollbar-width:thin}
+main{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0}
+@media (max-width:860px){.layout{grid-template-columns:1fr}.aside{position:static;max-height:none;overflow:visible}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+
+/* ── Buttons: chunky, they press down like a real button ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 16px;
+ border:2px solid var(--edge);border-radius:12px;background:var(--panel);font-weight:800;font-size:15px;cursor:pointer;
+ box-shadow:0 3px 0 var(--edge);transition:transform .08s,box-shadow .08s,background .15s;white-space:nowrap;text-decoration:none;color:var(--ink)}
+.btn:hover{background:var(--sunk)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent-deep);box-shadow:0 4px 0 var(--accent-deep);min-height:46px;font-size:16px}
+.btn.primary:hover{filter:brightness(1.06);background:var(--accent)}
+.btn.primary:active{box-shadow:0 1px 0 var(--accent-deep);transform:translateY(3px)}
+.btn.icon{width:42px;padding:0}
+.btn.small{min-height:36px;font-size:14px;padding:0 12px}
+.btn[aria-disabled=true]{opacity:.45}
+.btn svg{width:18px;height:18px;flex:none}
+.linkbtn{background:none;border:0;padding:0;cursor:pointer;color:inherit;font-weight:inherit;text-align:left}
+.linkbtn:hover{text-decoration:underline}
+
+/* ── Header ── */
+.top{display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;border-radius:16px;padding:4px 8px 4px 4px;margin:-4px -8px -4px -4px}
+.brand .disc{transition:transform .25s}
+.brand:hover .disc{transform:rotate(-14deg)}
+.brand:active .disc{transform:rotate(-14deg) scale(.94)}
+.brand h1{font-size:26px;font-weight:900;line-height:1.05}
+.brand p{margin:0;font-size:13.5px;color:var(--ink2);font-weight:700}
+.disc{width:58px;height:58px;flex:none}
+.disc .spin{transform-origin:50% 50%}
+.bubble{position:relative;flex:1;min-width:220px;max-width:62ch;background:var(--panel);border:2px solid var(--edge);border-radius:14px;
+ padding:9px 14px;font-size:14px;font-weight:700;line-height:1.4;min-height:42px;display:flex;align-items:center}
+.bubble::before{content:"";position:absolute;left:-9px;top:50%;width:14px;height:14px;background:var(--panel);
+ border-left:2px solid var(--edge);border-bottom:2px solid var(--edge);transform:translateY(-50%) rotate(45deg)}
+.bubble[data-kind=warn]{background:var(--sunk);border-color:var(--ink);box-shadow:inset 4px 0 0 var(--ink)}
+.bubble[data-kind=warn]::before{background:var(--sunk);border-color:var(--ink)}
+.tools{display:flex;gap:8px;margin-left:auto}
+@media (prefers-reduced-motion:no-preference){
+ body[data-busy=true] .disc .spin{animation:spin 1.1s linear infinite}
+ .disc .eyes{animation:blink 5s infinite}
+ .pop{animation:pop .25s ease-out}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@keyframes pop{0%{transform:scale(.96);opacity:.4}100%{transform:none;opacity:1}}
+.disc .eyes{transform-origin:50% 44%}
+
+/* ── Segmented control & chips ── */
+.seg{display:inline-flex;padding:3px;background:var(--sunk);border:2px solid var(--edge);border-radius:13px;gap:2px}
+.seg button{min-height:38px;padding:0 14px;border:0;border-radius:9px;background:none;font-weight:800;font-size:14.5px;cursor:pointer;color:var(--ink2)}
+.seg button[aria-selected=true]{background:var(--ink);color:var(--panel)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 13px;border:2px solid var(--edge);border-radius:99px;
+ background:var(--sunk);font-weight:800;font-size:14px;cursor:pointer;transition:transform .08s}
+.chip:active{transform:scale(.96)}
+.chip .n{font-weight:700;color:var(--ink2);font-size:12.5px}
+.chip[data-empty=true]:not([aria-pressed=true]){opacity:.5}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.chip[aria-pressed=true] .n{color:var(--panel);opacity:.8}
+
+/* ── Calendar heatmap ── */
+.cal-nav{display:flex;align-items:center;gap:8px;margin:14px 0 10px}
+.cal-nav b{flex:1;text-align:center;font-weight:900;font-size:17px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.wd{font-size:12px;font-weight:800;color:var(--ink2);text-align:center;padding-bottom:2px}
+.day{position:relative;aspect-ratio:1;min-height:38px;border:2px solid transparent;border-radius:11px;background:var(--heat0);cursor:pointer;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;padding:0;color:var(--heat-ink);
+ transition:transform .08s}
+.day:active{transform:scale(.93)}
+.day .dn{font-weight:700;font-size:16px}
+.day .dc{font-size:10.5px;font-weight:800;opacity:.85;min-height:11px}
+.day[data-lv="1"]{background:var(--heat1)}
+.day[data-lv="2"]{background:var(--heat2)}
+.day[data-lv="3"]{background:var(--heat3);color:var(--heat3-ink)}
+.day[data-lv="4"]{background:var(--heat4);color:var(--heat-ink-hi)}
+.day[data-in=true]{border-color:var(--ink);box-shadow:0 0 0 2px var(--panel) inset}
+.day[data-today=true]::after{content:"";position:absolute;bottom:3px;left:50%;width:14px;height:3px;margin-left:-7px;border-radius:3px;background:currentColor}
+.day[data-future=true]{opacity:.35;cursor:default}
+.day.blank{background:none;cursor:default}
+.rangebox{margin-top:14px;padding:12px;background:var(--sunk);border:2px solid var(--line);border-radius:14px}
+.rangebox .chip:not([aria-pressed=true]){background:var(--panel)}
+.rhint{margin:10px 2px 0;font-size:13.5px;font-weight:700;color:var(--ink2);line-height:1.45;max-width:62ch}
+.rhint b{color:var(--ink)}
+.day[data-pick=true]{border-color:var(--ink);border-style:dashed;box-shadow:0 0 0 2px var(--panel) inset}
+.legend{display:flex;align-items:center;gap:5px;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--ink2)}
+.legend i{width:16px;height:16px;border-radius:5px;display:inline-block}
+.legend .grow{flex:1}
+
+/* ── Filters ── */
+details.panel>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary h2::after{content:" ▾";color:var(--ink2);font-size:14px}
+details.panel[open]>summary h2::after{content:" ▴"}
+.fgrid{display:grid;gap:14px;margin-top:14px}
+.field label,.flabel{display:block;font-size:13px;font-weight:800;color:var(--ink2);margin-bottom:5px;letter-spacing:.01em}
+.search{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 6px 0 12px;background:var(--sunk);border:2px solid var(--edge);border-radius:12px}
+.search:focus-within{border-color:var(--ink)}
+.search input{flex:1;min-width:0;border:0;background:none;outline:0;font-size:15px;font-weight:700}
+.search svg{width:18px;height:18px;color:var(--ink2);flex:none}
+.search .clear{border:0;background:none;cursor:pointer;font-weight:900;color:var(--ink2);width:30px;height:30px;border-radius:8px}
+select{width:100%;min-height:42px;padding:0 36px 0 12px;background:var(--sunk);border:2px solid var(--edge);border-radius:12px;font-weight:700;font-size:15px;
+ appearance:none;cursor:pointer;
+ background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%);
+ background-position:calc(100% - 18px) 52%,calc(100% - 12px) 52%;background-size:6px 6px;background-repeat:no-repeat}
+.fnote{font-size:13px;color:var(--ink2);font-weight:700;min-height:18px}
+
+/* ── Selection header ── */
+.sel{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sel .title{flex:1;min-width:200px}
+.sel h2{font-size:26px;font-weight:900;line-height:1.15}
+.sel .sub{font-weight:700;color:var(--ink2);font-size:14.5px}
+.activef{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin-top:12px;padding:8px 8px 8px 14px;
+ background:var(--sunk);border:2px solid var(--edge);border-radius:14px;flex-basis:100%;grid-column:1/-1}
+.activef .what{flex:1;min-width:0;font-weight:700;font-size:14px;line-height:1.4}
+.activef .chip{background:var(--panel)}
+#selPanel,#calPanel{scroll-margin-top:12px}
+/* Floating "Pick a day" button: only on one-column layouts, once the calendar has scrolled out of view */
+.fab{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(18px + env(safe-area-inset-bottom));z-index:5;display:inline-flex;align-items:center;gap:8px;
+ min-height:50px;padding:0 18px 0 15px;border-radius:99px;border:2px solid var(--ink);background:var(--ink);color:var(--panel);
+ font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 4px 0 var(--edge),0 10px 24px rgba(0,0,0,.18);transition:transform .08s,box-shadow .08s}
+.fab svg{width:20px;height:20px}
+.fab:active{transform:translateY(3px);box-shadow:0 1px 0 var(--edge)}
+@media (min-width:861px){.fab{display:none}}
+.progress{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;margin-top:14px}
+.progress i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .25s}
+
+/* ── Summary ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:var(--sunk);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat b{display:block;font-size:28px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
+.stat span{font-size:13px;font-weight:800;color:var(--ink2)}
+@media (max-width:620px){.stats{grid-template-columns:1fr 1fr}}
+.block{margin-top:22px}
+.story{margin:0 0 18px;font-size:20px;line-height:1.5;max-width:40ch}
+.story b{font-weight:800}
+.hl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl-card{min-width:0}
+.hl-k{display:block;font-size:14px;color:var(--ink2);margin-bottom:6px}
+.hl .album b{font-size:15px;margin-top:8px}
+.hl .album span{font-size:14px}
+.raxis{justify-content:space-between}
+.raxis.q{display:grid;grid-template-columns:repeat(4,1fr);text-align:center}
+.morebtn{margin-top:24px}
+#summary{scroll-margin-top:12px}
+.block>h3{margin-bottom:10px}
+.rhythm{display:flex;align-items:flex-end;gap:3px;height:96px;padding:0 2px}
+.rhythm .bar{flex:1;min-width:2px;background:var(--bar);border-radius:5px 5px 2px 2px;min-height:3px}
+.rhythm .bar[data-zero=true]{background:var(--sunk)}
+.raxis{display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--ink2);margin-top:5px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media (max-width:620px){.cols{grid-template-columns:1fr}}
+ol.rank{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+ol.rank li{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center}
+ol.rank li:has(.play){grid-template-columns:30px 1fr auto auto}
+/* Play buttons: a round "press me" button, always visible so it works on touch too */
+.play{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;flex:none;
+ background:var(--sunk);border:2px solid var(--edge);box-shadow:0 2px 0 var(--edge);color:var(--ink);
+ transition:transform .08s,box-shadow .08s,background .15s}
+.play:hover{background:var(--accent);border-color:var(--accent-deep);box-shadow:0 2px 0 var(--accent-deep);color:var(--on-accent)}
+.play:active{transform:translateY(2px);box-shadow:0 0 0 var(--edge)}
+.play svg{width:14px;height:14px;margin-left:2px}
+.album-wrap{position:relative;min-width:0}
+.album-wrap .sq{position:absolute;left:0;top:0;width:100%;aspect-ratio:1;pointer-events:none}
+.album-wrap .play{position:absolute;right:7px;bottom:7px;pointer-events:auto;background:var(--panel)}
+.badge{width:28px;height:28px;border-radius:9px;background:var(--sunk);border:2px solid var(--edge);display:grid;place-items:center;font-weight:900;font-size:13px}
+ol.rank li:first-child .badge{background:var(--accent);color:var(--on-accent);border-color:var(--accent-deep)}
+.rname{min-width:0}
+.rname b,.rname span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rname b{font-weight:800;font-size:15px}
+.rname span{font-size:13px;color:var(--ink2);font-weight:700}
+.meter{height:5px;border-radius:9px;background:var(--sunk);margin-top:3px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--ink2);border-radius:9px}
+.cnt{font-weight:900;font-size:14px;color:var(--ink2)}
+.albums{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px}
+.album{position:relative;display:block;width:100%;border:0;background:none;padding:0;cursor:pointer;text-align:left;transition:transform .1s}
+.album:hover{transform:translateY(-2px) rotate(-1deg)}
+.album:active{transform:scale(.97)}
+.album .art{width:100%;aspect-ratio:1;border-radius:12px;border:2px solid var(--line)}
+.album b{display:block;font-size:13.5px;font-weight:800;margin-top:6px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.album span{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.album .sticker{position:absolute;top:-7px;left:-7px;background:var(--panel);border:2px solid var(--ink);border-radius:99px;padding:1px 8px;
+ font-size:12.5px;font-weight:900;transform:rotate(-6deg)}
+.album span.ph{display:grid;place-items:center;font-size:26px;font-weight:800;color:var(--tile-ink);margin:0;white-space:normal}
+.hl .album span.ph{font-size:36px}
+@media (max-width:620px){.album span.ph,.hl .album span.ph{font-size:22px;align-content:start;padding-top:18%}}
+.album[aria-pressed=true] .art{border-color:var(--ink);outline:3px solid var(--ink);outline-offset:1px}
+.art{display:block;object-fit:cover;background:var(--sunk)}
+.ph{display:grid;place-items:center;font-weight:900;color:var(--tile-ink)}
+
+/* ── On this day ── */
+.otd{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:12px}
+.otd button[data-extra=true]{display:none}
+.otd[data-all=true] button[data-extra=true]{display:grid}
+.otd .yr{font-size:20px}
+.otd button{grid-template-columns:minmax(0,1fr);min-width:0;border:2px solid var(--edge);background:var(--sunk);border-radius:14px;padding:12px;text-align:left;cursor:pointer;
+ box-shadow:0 3px 0 var(--edge);transition:transform .08s,box-shadow .08s;display:grid;gap:8px;align-content:start}
+.otd button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge)}
+.otd .yr{font-size:22px;font-weight:900;line-height:1}
+.otd .art{width:100%;aspect-ratio:1;border-radius:10px}
+.otd .meta{font-size:13px;font-weight:700;color:var(--ink2);line-height:1.35}
+.otd .meta b{color:var(--ink);font-weight:800;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.otd button[data-empty=true]{opacity:.6}
+
+/* ── Timeline ── */
+.tl-group{margin-top:18px}
+.tl-group:first-child{margin-top:0}
+.tl-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;position:sticky;top:0;background:var(--panel);padding:6px 0;z-index:1}
+.tl-head .pill{background:var(--ink);color:var(--panel);font-weight:900;font-size:13px;border-radius:99px;padding:3px 11px}
+.tl-head .rule{flex:1;height:2px;background:var(--line);border-radius:2px}
+.tl-head .n{font-weight:800;font-size:13px;color:var(--ink2)}
+ul.tl{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+ul.tl li{display:grid;grid-template-columns:48px 46px 1fr auto;gap:12px;align-items:center;padding:5px 6px;border-radius:12px}
+ul.tl li:hover{background:var(--sunk)}
+.tl time{font-weight:900;font-size:14px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.tl .art{width:46px;height:46px;border-radius:9px;font-size:15px}
+.tl .t{min-width:0}
+.tl .t b{display:block;font-weight:800;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl .t span{display:block;font-size:13.5px;color:var(--ink2);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.more{margin-top:14px}
+
+/* ── Empty and error ── */
+.empty{display:grid;justify-items:start;gap:10px;padding:8px 0}
+.empty p{margin:0;max-width:62ch;font-weight:700;color:var(--ink2);line-height:1.6}
+.empty b{font-size:19px;font-weight:900;color:var(--ink)}
+
+/* ── Setup ── */
+.setup{max-width:560px;margin:10px auto}
+.setup p{max-width:62ch;line-height:1.6;margin:0 0 14px;font-weight:600}
+.setup .field{margin-bottom:14px}
+.setup input{width:100%;min-height:44px;padding:0 12px;background:var(--sunk);border:2px solid var(--edge);border-radius:12px;font-size:15px;font-weight:700}
+.setup input:focus{border-color:var(--ink);outline:0}
+.setup .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.playpref{margin:18px 0 6px;padding-top:16px;border-top:2px solid var(--line)}
+.playpref .fnote{margin-top:8px}
+.steps{margin:0 0 16px;padding-left:22px;line-height:1.65;font-weight:600;max-width:62ch}
+
+/* ── Share dialog ── */
+dialog{border:0;padding:0;background:none;color:var(--ink);max-width:min(560px,94vw);width:100%}
+dialog::backdrop{background:var(--scrim)}
+.sheet{background:var(--panel);border-radius:22px;padding:20px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.sheet .preview{display:grid;place-items:center;background:var(--sunk);border-radius:16px;padding:14px;margin:14px 0}
+.sheet .preview img{height:min(62vh,560px);height:min(50dvh,520px);width:auto;border-radius:14px;box-shadow:var(--shadow)}
+.swatches{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sw{width:36px;height:36px;border-radius:50%;border:3px solid var(--panel);box-shadow:0 0 0 2px var(--edge);cursor:pointer}
+.sw[aria-pressed=true]{box-shadow:0 0 0 3px var(--ink)}
+.sheet .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:14px}
+@media (max-width:620px){.albums{grid-template-columns:repeat(3,1fr);gap:10px}.sel h2{font-size:22px}}
+@media (hover:none){.hint{display:none}}
+/* Small phones (iPhone 12 mini is 375 wide) */
+@media (max-width:620px){
+ .sel{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px}
+ .sel .title{min-width:0}
+ .sel h2{font-size:21px}
+ #shareBtn{grid-column:1/-1}
+ ul.tl li{grid-template-columns:40px 42px minmax(0,1fr) auto;gap:9px;padding:5px 2px}
+ .tl .art{width:42px;height:42px}
+ .otd{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .otd button{padding:8px;gap:6px}
+ .otd .yr{font-size:17px}
+}
+/* iOS zooms the page into any text field under 16px; keep them at 16px on touch screens */
+@media (pointer:coarse){.search input,.setup input,select{font-size:16px}}
+/* ── Reading comfort ──
+   Bold is kept for titles, names and buttons. Everything you read around them is regular weight,
+   because walls of heavy bold are hard going with dyslexia. */
+.brand p,.sel .sub,.rname span,.tl .t span,.album span,.otd .meta,.fnote,.hint,.rhint,.legend,.raxis,.empty p,
+.setup p,.steps,.bubble,.small,.flabel,.field label,.wd,.tl time,.activef .what,.hl-k,.story{font-weight:400}
+.rname b,.tl .t b,.album b,.otd .meta b,.activef .what b{font-weight:700}
+.chip,.seg button,.btn{font-weight:700}
+h3{font-weight:700;font-size:15px}
+.sel .sub,.bubble{font-size:15px}
+kbd{font:inherit;font-weight:900;font-size:12px;border:2px solid var(--edge);border-bottom-width:3px;border-radius:6px;padding:0 5px}
+.hint{font-size:12.5px;font-weight:700;color:var(--ink2);margin-top:10px}
+</style>
+</head>
+<body data-busy="false">
+<div class="wrap">
+
+<header class="top">
+ <a class="brand" id="homeLink" href="#" title="Back to today" aria-label="past.fm: back to today">
+  <!-- ═══ MASCOT ═══ Replace everything between these two comments with your own mascot
+       (an <img src="mascot.png" class="disc" alt=""> works too). Keep class="disc" so it keeps its size. -->
+  <svg class="disc" viewBox="0 0 64 64" aria-hidden="true">
+   <g class="spin">
+    <circle cx="32" cy="32" r="30" fill="var(--vinyl)"/>
+    <circle cx="32" cy="32" r="24" fill="none" stroke="var(--edge)" stroke-width="1"/>
+    <circle cx="32" cy="32" r="19" fill="none" stroke="var(--edge)" stroke-width="1"/>
+    <circle cx="32" cy="32" r="11" fill="var(--accent)"/>
+    <circle cx="32" cy="32" r="2.2" fill="var(--vinyl)"/>
+    <path d="M10 22a24 24 0 0 1 9-10" stroke="var(--eye)" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".5"/>
+   </g>
+   <g class="eyes">
+    <ellipse cx="25" cy="28" rx="3.6" ry="4.6" fill="var(--eye)"/><ellipse cx="39" cy="28" rx="3.6" ry="4.6" fill="var(--eye)"/>
+    <circle cx="25.8" cy="29" r="1.8" fill="var(--pupil)"/><circle cx="39.8" cy="29" r="1.8" fill="var(--pupil)"/>
+   </g>
+   <path d="M27 37q5 4 10 0" stroke="var(--eye)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  </svg>
+  <!-- ═══ END MASCOT ═══ -->
+  <div><h1>past.fm</h1><p>What were you playing that day?</p></div>
+ </a>
+ <div class="bubble" id="status" role="status" aria-live="polite" data-kind="">Hi. Pick a day and I'll dig it out.</div>
+ <div class="tools">
+  <button class="btn icon" id="themeBtn" aria-label="Theme: follow the system" title="Theme">
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+  </button>
+  <button class="btn" id="settingsBtn" title="Settings">
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+   <span id="userLabel">Settings</span>
+  </button>
+ </div>
+</header>
+
+<!-- First run and settings -->
+<section class="panel setup" id="setup" hidden>
+ <h2 style="margin-bottom:12px" id="setupTitle">Connect to Last.fm</h2>
+ <p>past.fm reads your scrobbles straight from Last.fm. It needs your username and a free API key. Both stay in this browser on this device.</p>
+ <ol class="steps">
+  <li>Open <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">last.fm/api/account/create</a> while logged in.</li>
+  <li>Fill in any app name, like "past.fm". Leave the callback empty.</li>
+  <li>Copy the <b>API key</b> (not the shared secret) and paste it below.</li>
+ </ol>
+ <div class="field"><label for="userIn">Last.fm username</label><input id="userIn" autocomplete="off" spellcheck="false" value="djmitchel"></div>
+ <div class="field"><label for="keyIn">API key</label><input id="keyIn" autocomplete="off" spellcheck="false" placeholder="32 letters and numbers"></div>
+ <div class="field playpref">
+  <span class="flabel" id="playPrefLabel">Play buttons open</span>
+  <div class="chips" id="playPref" role="group" aria-labelledby="playPrefLabel"></div>
+  <div class="fnote">Saved as soon as you tap. The ▶ buttons open a search for that song or album there.</div>
+ </div>
+ <div class="fnote" id="setupNote"></div>
+ <div class="row">
+  <button class="btn primary" id="saveBtn">Start listening back</button>
+  <button class="btn" id="demoBtn">Try with sample data</button>
+  <button class="btn" id="cancelSetup" hidden>Cancel</button>
+ </div>
+</section>
+
+<div class="layout" id="app" hidden>
+ <aside class="aside">
+  <section class="panel" id="calPanel" aria-labelledby="calTitle">
+   <div class="panel-head">
+    <h2 id="calTitle">Calendar</h2>
+    <div class="seg" role="tablist" aria-label="How much to show">
+     <button role="tab" data-mode="day" aria-selected="true">Day</button>
+     <button role="tab" data-mode="week" aria-selected="false">Week</button>
+     <button role="tab" data-mode="month" aria-selected="false">Month</button>
+     <button role="tab" data-mode="range" aria-selected="false">Range</button>
+    </div>
+   </div>
+   <div class="rangebox" id="rangeBox" hidden>
+    <div class="chips" role="group" aria-label="Quick ranges">
+     <button class="chip" data-preset="7">Last 7 days</button>
+     <button class="chip" data-preset="14">Last 2 weeks</button>
+     <button class="chip" data-preset="30">Last 30 days</button>
+     <button class="chip" data-preset="90">Last 3 months</button>
+    </div>
+    <p class="rhint" id="rangeHint" aria-live="polite"></p>
+   </div>
+   <div class="cal-nav">
+    <button class="btn icon small" id="calPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <b id="calMonth">October 2026</b>
+    <button class="btn icon small" id="calNext" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+   </div>
+   <div class="cal-grid" id="calGrid"></div>
+   <div class="legend"><span>Fewer</span><i style="background:var(--heat0)"></i><i style="background:var(--heat1)"></i><i style="background:var(--heat2)"></i><i style="background:var(--heat3)"></i><i style="background:var(--heat4)"></i><span>More</span><span class="grow"></span>
+    <button class="btn small" id="todayBtn">Today</button></div>
+  </section>
+
+  <details class="panel" id="filtersBox">
+   <summary><h2>Filters</h2><span class="fnote" id="filterCount"></span></summary>
+   <div class="fgrid">
+    <div class="field">
+     <label for="q">Search</label>
+     <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input id="q" type="search" placeholder="Song, artist or album" autocomplete="off">
+      <button class="clear" id="qClear" aria-label="Clear search" hidden>×</button>
+     </div>
+    </div>
+    <div>
+     <span class="flabel" id="todLabel">Time of day</span>
+     <div class="chips" id="todChips" role="group" aria-labelledby="todLabel"></div>
+    </div>
+    <div class="field"><label for="fArtist">Artist</label><select id="fArtist"></select></div>
+    <div class="field"><label for="fAlbum">Album</label><select id="fAlbum"></select></div>
+    <div class="field"><label for="fGenre">Genre</label><select id="fGenre"></select></div>
+    <div class="field"><label for="fCountry">Country</label><select id="fCountry"></select></div>
+    <div class="fnote" id="enrichNote"></div>
+    <button class="btn" id="clearFilters">Clear all filters</button>
+   </div>
+  </details>
+ </aside>
+
+ <main>
+  <section class="panel" id="selPanel">
+   <div class="sel">
+    <button class="btn icon" id="selPrev" aria-label="Previous day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="title"><h2 id="selTitle">…</h2><div class="sub" id="selSub"></div></div>
+    <button class="btn icon" id="selNext" aria-label="Next day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    <button class="btn primary" id="shareBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10 18h4"/></svg>Make a day card</button>
+    <div class="activef" id="activeF" hidden><span class="what"><b>Only:</b> <span id="activeFText"></span></span><button class="chip" id="clearF2">✕ Clear</button></div>
+   </div>
+   <div class="progress" id="progress" hidden><i></i></div>
+  </section>
+
+  <section class="panel" id="summary" aria-label="Summary"></section>
+  <section class="panel" id="otdPanel" aria-labelledby="otdTitle" hidden>
+   <div class="panel-head"><h2 id="otdTitle">On this day</h2><span class="fnote" id="otdNote"></span></div>
+   <div class="otd" id="otd"></div>
+   <button class="btn more" id="otdMore" hidden>Show all years</button>
+  </section>
+  <section class="panel" id="timelinePanel" aria-labelledby="tlTitle">
+   <div class="panel-head"><h2 id="tlTitle">Timeline</h2><span class="fnote" id="tlNote"></span></div>
+   <div id="timeline"></div>
+  </section>
+ </main>
+</div>
+</div>
+
+<button class="fab" id="calJump" hidden aria-label="Back to the calendar to pick a day">
+ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+ Pick a day
+</button>
+
+<dialog id="shareDlg" aria-labelledby="shareTitle">
+ <div class="sheet">
+  <div class="panel-head" style="margin:0"><h2 id="shareTitle">Your day card</h2><button class="btn icon small" id="shareClose" aria-label="Close">×</button></div>
+  <div class="preview"><img id="cardImg" alt="Preview of the day card"></div>
+  <div class="swatches" id="swatches" role="group" aria-label="Card colour"><span class="flabel" style="margin:0 6px 0 0">Colour</span></div>
+  <p class="hint" id="cardHint">Sized 1080 × 2340, the screen of an iPhone 12 mini. It fits any recent phone.</p>
+  <div class="row">
+   <button class="btn" id="shareNative" hidden>Share</button>
+   <a class="btn primary" id="cardSave" download="past-fm.png" href="#">Save image</a>
+  </div>
+ </div>
+</dialog>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════════
+   past.fm — browse your Last.fm scrobbles by day, week or month.
+   One file, no build step. Settings and lookups are kept in this
+   browser's localStorage; nothing is sent anywhere except Last.fm
+   (scrobbles, genres) and MusicBrainz (artist countries).
+   ════════════════════════════════════════════════════════════════ */
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2, "0");
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("nd." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("nd." + k, JSON.stringify(v)); } catch {} }
+};
+
+/* ── Dates (always local time, weeks start on Monday) ── */
+const sod = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const dkey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseKey = k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
+const mondayOf = d => addDays(sod(d), -((d.getDay() + 6) % 7));
+const unix = d => Math.floor(d.getTime() / 1000);
+/* Range mode: S.range holds the first and last day (both included). */
+const MAX_RANGE_DAYS = 366;
+const daysBetween = (a, b) => Math.round((sod(b) - sod(a)) / 864e5);
+function lastDays(n) { const t = sod(new Date()); return { from: addDays(t, -(n - 1)), to: t }; }
+function rangeOf(mode, a) {
+  if (mode === "range") { const r = S.range || lastDays(14); return [sod(r.from), addDays(r.to, 1)]; }
+  if (mode === "week") { const m = mondayOf(a); return [m, addDays(m, 7)]; }
+  if (mode === "month") return [new Date(a.getFullYear(), a.getMonth(), 1), new Date(a.getFullYear(), a.getMonth() + 1, 1)];
+  return [sod(a), addDays(a, 1)];
+}
+const fmt = (o, d) => new Intl.DateTimeFormat("en-GB", o).format(d);
+const fTime = d => fmt({ hour: "2-digit", minute: "2-digit", hour12: false }, d);
+
+/* Four parts of the day. Hours are [start, end). */
+const TOD = [
+  { id: "night", label: "Night", from: 0, to: 6 },
+  { id: "morning", label: "Morning", from: 6, to: 12 },
+  { id: "afternoon", label: "Afternoon", from: 12, to: 18 },
+  { id: "evening", label: "Evening", from: 18, to: 24 },
+];
+const todOf = h => TOD.find(t => h >= t.from && h < t.to).id;
+
+/* ── State ── */
+const S = {
+  user: store.get("user", ""), key: store.get("key", ""), demo: false,
+  more: store.get("more", false), mode: store.get("mode", "day"), anchor: sod(new Date()), month: null, range: null, pickStart: null,
+  plays: [], gen: 0, registered: null, error: null, showAll: false,
+  f: { q: "", tod: new Set(), artist: "", album: "", genre: "", country: "" },
+  theme: store.get("theme", "system"), listen: store.get("listen2", "ytmusic"),
+};
+S.month = new Date(S.anchor.getFullYear(), S.anchor.getMonth(), 1);
+
+/* ── Status: one place, three kinds ── */
+function status(text, kind = "") {
+  const el = $("#status");
+  el.textContent = text; el.dataset.kind = kind;
+  document.body.dataset.busy = kind === "busy";
+  el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+}
+function progress(frac) {
+  const p = $("#progress");
+  if (frac == null) { p.hidden = true; return; }
+  p.hidden = false; p.firstElementChild.style.width = Math.max(4, Math.min(100, frac * 100)) + "%";
+}
+
+/* ════════ Data sources ════════ */
+class ApiError extends Error { constructor(code, msg) { super(msg); this.code = code; } }
+
+function explain(e) {
+  if (e instanceof ApiError) {
+    if (e.code === 10 || e.code === 26) return "Last.fm didn't accept the API key. Open Settings and paste the 32-character API key again (not the shared secret).";
+    if (e.code === 6) return `Last.fm can't find the user "${S.user}". Check the spelling in Settings.`;
+    if (e.code === 17) return "Last.fm is keeping this listening history private. In Last.fm settings under Privacy, switch off \"Hide recent listening information\", then press Try again.";
+    if (e.code === 29) return "Last.fm asked us to slow down. Wait a minute, then press Try again.";
+    return `Last.fm said: ${e.message}. Press Try again in a moment.`;
+  }
+  return "Couldn't reach Last.fm. Check the internet connection, then press Try again.";
+}
+
+const LastFM = {
+  async call(params, tries = 4) {
+    const u = new URL("https://ws.audioscrobbler.com/2.0/");
+    Object.entries({ ...params, api_key: S.key, format: "json" }).forEach(([k, v]) => u.searchParams.set(k, v));
+    for (let i = 0; ; i++) {
+      let res, j;
+      try { res = await fetch(u); j = await res.json(); }
+      catch (err) { if (i < tries - 1) { await sleep(800 * (i + 1)); continue; } throw err; }
+      if (j && j.error) {
+        // 8: temporary backend error, 16: try again, 29: rate limit
+        if ([8, 16, 29].includes(j.error) && i < tries - 1) { await sleep(1200 * (i + 1)); continue; }
+        throw new ApiError(j.error, j.message || "Something went wrong");
+      }
+      if (!res.ok) { if (i < tries - 1) { await sleep(1000 * (i + 1)); continue; } throw new ApiError(res.status, res.statusText); }
+      return j;
+    }
+  },
+  async info() {
+    const u = (await this.call({ method: "user.getinfo", user: S.user })).user;
+    return { name: u.name, registered: new Date(+u.registered.unixtime * 1000) };
+  },
+  toPlay(t) {
+    if (t["@attr"] && t["@attr"].nowplaying) return null;
+    if (!t.date) return null;
+    const imgs = t.image || [];
+    let art = (imgs.find(i => i.size === "extralarge") || imgs[imgs.length - 1] || {})["#text"] || "";
+    if (art.includes("2a96cbd8b46e442fc41c2b86b821562f")) art = ""; // Last.fm's grey star placeholder
+    const a = t.artist || {};
+    return { ts: +t.date.uts, track: t.name, artist: a["#text"] || a.name || "Unknown artist", amb: a.mbid || "",
+             album: (t.album && t.album["#text"]) || "", art, url: t.url };
+  },
+  async plays(from, to, onProgress) {
+    const page = p => this.call({ method: "user.getrecenttracks", user: S.user, from, to, limit: 200, page: p });
+    const first = (await page(1)).recenttracks;
+    const total = +((first["@attr"] || {}).totalPages || 1);
+    const pages = [first];
+    let done = 1; onProgress && onProgress(done / total);
+    const todo = []; for (let p = 2; p <= total; p++) todo.push(p);
+    await pool(todo, 3, async p => { pages[p - 1] = (await page(p)).recenttracks; onProgress && onProgress(++done / total); });
+    const seen = new Map();
+    for (const pg of pages) {
+      const list = Array.isArray(pg.track) ? pg.track : pg.track ? [pg.track] : [];
+      for (const t of list) {
+        const p = this.toPlay(t);
+        if (p && p.ts >= from && p.ts <= to) seen.set(p.ts + "|" + p.track, p);
+      }
+    }
+    return [...seen.values()].sort((a, b) => a.ts - b.ts);
+  },
+  async count(from, to) {
+    const j = await this.call({ method: "user.getrecenttracks", user: S.user, from, to, limit: 1 });
+    return +((j.recenttracks["@attr"] || {}).total || 0);
+  },
+  async genre(artist) {
+    const j = await this.call({ method: "artist.gettoptags", artist, autocorrect: 1 }, 2);
+    return pickGenre(((j.toptags || {}).tag || []).map(t => t.name));
+  },
+  async country(artist, mbid) {
+    // MusicBrainz asks for at most one request a second; the queue below keeps to that.
+    const mb = async url => { const r = await fetch(url); if (r.status === 503) throw new ApiError(503, "busy"); return r.ok ? r.json() : null; };
+    let a = null;
+    if (mbid) a = await mb(`https://musicbrainz.org/ws/2/artist/${mbid}?fmt=json`);
+    if (!a) {
+      await sleep(1100);
+      const q = encodeURIComponent(`artist:"${artist.replace(/"/g, "")}"`);
+      const j = await mb(`https://musicbrainz.org/ws/2/artist/?query=${q}&fmt=json&limit=1`);
+      a = j && j.artists && j.artists[0] && j.artists[0].score >= 90 ? j.artists[0] : null;
+    }
+    if (!a) return "";
+    return a.country || ((a.area || {})["iso-3166-1-codes"] || [])[0] || "";
+  }
+};
+
+const JUNK_TAGS = /^(seen live|favou?rites?|favorite artists?|love|loved|awesome|beautiful|albums i own|my .*|under \d+.*|\d{2,4}s?|female vocalists?|male vocalists?|spotify|check out|best.*|cool|amazing|good|great|all|music|uk|usa|us|.*\blisteners\b.*)$/i;
+function pickGenre(tags) {
+  const t = tags.map(s => s.trim()).find(s => s && !JUNK_TAGS.test(s));
+  return t ? t.toLowerCase().replace(/(^|[\s\-\/&])(\p{L})/gu, (m, a, c) => a + c.toUpperCase()) : "";
+}
+
+/* Sample data for trying it without an API key. Same shape as the real thing. */
+const Demo = (() => {
+  const A = [
+    ["Velvet Static","Dream pop","GB",["Neon Lull","Slow Satellites"]],["Mara Okoye","Afrobeats","NG",["Lagos Glow","Harmattan"]],
+    ["Kuroi Kaze","City pop","JP",["Midnight Expressway","Shibuya 4AM"]],["The Tram Lines","Indie rock","PT",["Alfama Nights","Rua Augusta"]],
+    ["Lotte & de Dijken","Indie folk","NL",["Polderlicht","Grachten"]],["Pixel Choir","Chiptune","SE",["8-bit Hymns","Save Point"]],
+    ["Sol Rivera","Bossa nova","BR",["Ondas","Café Lento"]],["Gloomhaus","Post-punk","DE",["Beton","Nachtbus"]],
+    ["Ana Fado","Fado","PT",["Saudade Sessions","Tejo"]],["Moth Radio","Ambient","IS",["Low Tide","Hum"]],
+    ["Big Little Bass","Drum and bass","GB",["Rollers","Night Shift"]],["Juniper Kid","Bedroom pop","US",["Lunchbox","Teenage Weather"]],
+  ];
+  const songs = ["Glow","Afterparty","Paper Moon","Lisboa Rain","Satellite","Hold Still","Tram 28","Golden Hour","Lowlight","Polaroid",
+    "Fast Forward","Cassette","Sundown","Slow Dance","Heatwave","Static Love","North Star","Velvet","Echo Park","Daydream","Night Bus","Overexposed"];
+  const rnd = seed => () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const hash = s => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const registered = new Date(2014, 2, 3);
+  function day(d) {
+    const r = rnd(hash(dkey(d)));
+    const wk = d.getDay() === 0 || d.getDay() === 6;
+    const n = r() < .12 ? 0 : Math.floor(r() * (wk ? 140 : 90)) + 3;
+    const fav = [Math.floor(r() * A.length), Math.floor(r() * A.length), Math.floor(r() * A.length)];
+    const out = []; let t = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 7 + Math.floor(r() * 3), Math.floor(r() * 60)).getTime();
+    for (let i = 0; i < n; i++) {
+      const ai = r() < .65 ? fav[Math.floor(r() * 3)] : Math.floor(r() * A.length);
+      const [artist, , , albums] = A[ai];
+      out.push({ ts: Math.floor(t / 1000), track: songs[Math.floor(r() * songs.length)], artist, amb: "", album: albums[Math.floor(r() * 2)], art: "", url: "" });
+      t += (r() < .08 ? 40 + r() * 120 : 2.5 + r() * 2.5) * 60000;
+      if (new Date(t).getDate() !== d.getDate()) break;
+    }
+    return out;
+  }
+  return {
+    async info() { return { name: S.user || "sample", registered }; },
+    async plays(from, to, onp) {
+      await sleep(250); const out = [];
+      for (let d = sod(new Date(from * 1000)); unix(d) <= to; d = addDays(d, 1)) { if (d >= registered && d <= new Date()) out.push(...day(d)); }
+      onp && onp(1);
+      return out.filter(p => p.ts >= from && p.ts <= to && p.ts * 1000 <= Date.now());
+    },
+    async count(from, to) { await sleep(15); return (await this.plays(from, to)).length; },
+    async genre(a) { await sleep(40); return (A.find(x => x[0] === a) || [])[1] || ""; },
+    async country(a) { await sleep(60); return (A.find(x => x[0] === a) || [])[2] || ""; },
+  };
+})();
+
+const src = () => (S.demo ? Demo : LastFM);
+
+/* Run fn over items, a few at a time. */
+async function pool(items, n, fn) {
+  let i = 0;
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) await fn(items[i++]); }));
+}
+
+/* ── Caches ── */
+const userSlot = () => (S.demo ? "demo" : (S.user || "").toLowerCase());
+const playCache = new Map();          // range → plays, in memory only (months can be big)
+let counts = {};                      // "2026-10-15" → scrobbles that day; past days are saved
+let genres = store.get("genres2", {}); // artist (lowercase) → genre, "" when unknown
+let countries = store.get("countries", {}); // artist (lowercase) → ISO code, "" when unknown
+let saveTimer;
+function saveSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    if (!S.demo) { store.set("genres2", genres); store.set("countries", countries); }
+    const keep = {}; const cutoff = Date.now() - 2 * 864e5; // late scrobbles arrive; only save days that are settled
+    for (const [k, v] of Object.entries(counts)) if (parseKey(k).getTime() < cutoff) keep[k] = v;
+    store.set("counts." + userSlot(), keep);
+  }, 600);
+}
+
+/* ════════ Enrichment: genres and countries, looked up in the background ════════ */
+const Enrich = {
+  queue: [], running: false, total: 0, done: 0,
+  start(plays) {
+    const freq = new Map();
+    plays.forEach(p => { const k = p.artist.toLowerCase(); const e = freq.get(k) || { n: 0, name: p.artist, mbid: p.amb }; e.n++; freq.set(k, e); });
+    this.queue = [...freq.entries()].filter(([k]) => !(k in genres) || !(k in countries)).sort((a, b) => b[1].n - a[1].n).map(([k, v]) => ({ k, ...v }));
+    this.total = this.queue.length; this.done = 0;
+    this.note();
+    if (!this.running) this.run();
+  },
+  async run() {
+    this.running = true;
+    while (this.queue.length) {
+      const it = this.queue.shift();
+      const s = src();
+      const jobs = [];
+      if (!(it.k in genres)) jobs.push(s.genre(it.name).then(g => { genres[it.k] = g; }).catch(() => {}));
+      if (!(it.k in countries)) jobs.push(s.country(it.name, it.mbid).then(c => { countries[it.k] = c; }).catch(e => { if (!(e instanceof ApiError)) countries[it.k] = ""; }));
+      await Promise.all(jobs);
+      if (!S.demo && jobs.length) await sleep(1100); // be kind to MusicBrainz
+      this.done++; this.note(); saveSoon(); renderSoon();
+    }
+    this.running = false; this.note();
+  },
+  note() {
+    $("#enrichNote").textContent = this.queue.length
+      ? `Looking up genres and countries: ${this.done} of ${this.total} artists. The lists fill in as they arrive.`
+      : "";
+  }
+};
+const genreOf = p => genres[p.artist.toLowerCase()];
+const countryOf = p => countries[p.artist.toLowerCase()];
+const regionName = new Intl.DisplayNames(["en"], { type: "region" });
+const countryLabel = c => { try { return c ? regionName.of(c) : "Unknown"; } catch { return c; } };
+const flag = c => c && /^[A-Z]{2}$/.test(c) ? String.fromCodePoint(...[...c].map(ch => 127397 + ch.charCodeAt(0))) : "";
+
+/* ════════ Filtering ════════ */
+const albumKey = p => p.artist + "\u0001" + p.album;
+function activeFilters() {
+  const f = S.f; let n = 0;
+  if (f.q) n++; if (f.tod.size) n++; if (f.artist) n++; if (f.album) n++; if (f.genre) n++; if (f.country) n++;
+  return n;
+}
+function view() {
+  const f = S.f, q = f.q.toLowerCase();
+  return S.plays.filter(p => {
+    if (q && !(`${p.track} ${p.artist} ${p.album}`.toLowerCase().includes(q))) return false;
+    if (f.tod.size && !f.tod.has(todOf(new Date(p.ts * 1000).getHours()))) return false;
+    if (f.artist && p.artist !== f.artist) return false;
+    if (f.album && albumKey(p) !== f.album) return false;
+    if (f.genre && (genreOf(p) || "?") !== f.genre) return false;
+    if (f.country && (countryOf(p) || "?") !== f.country) return false;
+    return true;
+  });
+}
+function tally(list, keyFn) {
+  const m = new Map();
+  for (const p of list) { const k = keyFn(p); if (k == null) continue; const e = m.get(k) || { k, n: 0, p }; e.n++; m.set(k, e); }
+  return [...m.values()].sort((a, b) => b.n - a.n || String(a.k).localeCompare(String(b.k)));
+}
+
+/* ════════ Listen links ════════
+   Search links, so no accounts or API keys are needed. They land on the
+   service's search results for "artist + song" (or "artist + album"). */
+const SERVICES = {
+  ytmusic: { name: "YouTube Music", url: q => `https://music.youtube.com/search?q=${encodeURIComponent(q)}` },
+  tidal:   { name: "Tidal",         url: q => `https://listen.tidal.com/search?q=${encodeURIComponent(q)}` },
+  youtube: { name: "YouTube",       url: q => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}` },
+  spotify: { name: "Spotify",       url: q => `https://open.spotify.com/search/${encodeURIComponent(q)}` },
+};
+function renderPlayPref() {
+  $("#playPref").innerHTML = Object.entries(SERVICES).map(([k, sv]) =>
+    `<button class="chip" data-listen="${k}" aria-pressed="${S.listen === k}">${sv.name}</button>`).join("");
+}
+const PLAY_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`;
+function playLink(artist, what) {
+  const sv = SERVICES[S.listen] || SERVICES.ytmusic;
+  return `<a class="play" href="${esc(sv.url(artist + " " + what))}" target="_blank" rel="noopener" aria-label="Play ${esc(what)} by ${esc(artist)} on ${sv.name}" title="Play on ${sv.name}">${PLAY_ICON}</a>`;
+}
+
+/* ════════ Rendering ════════ */
+const TILE = ["--t1", "--t2", "--t3", "--t4", "--t5"];
+function tileVar(s) { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return TILE[h % TILE.length]; }
+function initials(s) { return (s || "?").replace(/^the /i, "").split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase(); }
+function artHTML(p, cls = "art") {
+  if (p.art) return `<img class="${cls}" src="${esc(p.art)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-ph="${esc(initials(p.album || p.artist))}" data-tile="${tileVar(p.album || p.artist)}">`;
+  return `<span class="${cls} ph" style="background:var(${tileVar(p.album || p.artist)})">${esc(initials(p.album || p.artist))}</span>`;
+}
+
+function spanWord() {
+  if (S.mode !== "range") return "that " + S.mode;
+  const n = rangeDays();
+  return n === 1 ? "that day" : `those ${n} days`;
+}
+function rangeDays() { const [a, b] = rangeOf(S.mode, S.anchor); return Math.round((b - a) / 864e5); }
+function selTitle() {
+  const [a, b] = rangeOf(S.mode, S.anchor);
+  if (S.mode === "day") return fmt({ weekday: "long", day: "numeric", month: "long", year: "numeric" }, a);
+  if (S.mode === "month") return fmt({ month: "long", year: "numeric" }, a);
+  const e = addDays(b, -1);
+  if (+e === +a) return fmt({ weekday: "long", day: "numeric", month: "long", year: "numeric" }, a);
+  if (a.getFullYear() !== e.getFullYear()) return `${fmt({ day: "numeric", month: "short", year: "numeric" }, a)} – ${fmt({ day: "numeric", month: "short", year: "numeric" }, e)}`;
+  return `${fmt({ day: "numeric", month: a.getMonth() === e.getMonth() ? undefined : "short" }, a)} – ${fmt({ day: "numeric", month: "short", year: "numeric" }, e)}`;
+}
+
+function renderCalendar() {
+  const m = S.month, y = m.getFullYear(), mo = m.getMonth();
+  $("#calMonth").textContent = fmt({ month: "long", year: "numeric" }, m);
+  const first = new Date(y, mo, 1), lead = (first.getDay() + 6) % 7, days = new Date(y, mo + 1, 0).getDate();
+  const today = sod(new Date()), [ra, rb] = rangeOf(S.mode, S.anchor);
+  let max = 0; for (let d = 1; d <= days; d++) max = Math.max(max, counts[dkey(new Date(y, mo, d))] || 0);
+  let h = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(w => `<div class="wd" aria-hidden="true">${w[0]}</div>`).join("");
+  for (let i = 0; i < lead; i++) h += `<div class="day blank" aria-hidden="true"></div>`;
+  for (let d = 1; d <= days; d++) {
+    const dt = new Date(y, mo, d), k = dkey(dt), c = counts[k], fut = dt > today;
+    const lv = c == null ? "" : c === 0 ? 0 : Math.max(1, Math.min(4, Math.ceil((c / Math.max(max, 1)) * 4)));
+    const inSel = dt >= ra && dt < rb;
+    const label = `${fmt({ weekday: "long", day: "numeric", month: "long" }, dt)}, ${fut ? "still to come" : c == null ? "counting" : c + (c === 1 ? " scrobble" : " scrobbles")}`;
+    h += `<button class="day" title="${fut ? "" : c == null ? "" : c + (c === 1 ? " scrobble" : " scrobbles")}" data-k="${k}" data-lv="${lv}" data-in="${inSel}" data-today="${+dt === +today}" data-future="${fut}" data-pick="${!!S.pickStart && +dt === +S.pickStart}" aria-label="${label}" aria-pressed="${inSel}">
+      <span class="dn">${d}</span></button>`;
+  }
+  $("#calGrid").innerHTML = h;
+  const nextMonth = new Date(y, mo + 1, 1);
+  $("#calNext").setAttribute("aria-disabled", nextMonth > today);
+}
+
+let countGen = 0;
+async function fillCounts() {
+  const g = ++countGen, m = S.month, y = m.getFullYear(), mo = m.getMonth(), days = new Date(y, mo + 1, 0).getDate(), today = sod(new Date());
+  const todo = [];
+  for (let d = 1; d <= days; d++) { const dt = new Date(y, mo, d); if (dt <= today && counts[dkey(dt)] == null) todo.push(dt); }
+  let pending = 0;
+  await pool(todo, 4, async dt => {
+    if (g !== countGen) return;
+    try { counts[dkey(dt)] = await src().count(unix(dt), unix(addDays(dt, 1)) - 1); }
+    catch { return; }
+    if (g === countGen && ++pending % 3 === 0) renderCalendar();
+  });
+  if (g === countGen) { renderCalendar(); saveSoon(); }
+}
+
+function renderFilters() {
+  const all = S.plays, f = S.f;
+  $("#todChips").innerHTML = TOD.map(t => {
+    const n = all.filter(p => todOf(new Date(p.ts * 1000).getHours()) === t.id).length;
+    return `<button class="chip" data-tod="${t.id}" data-empty="${!n}" aria-pressed="${f.tod.has(t.id)}" aria-label="${t.label}, ${n} scrobble${n === 1 ? "" : "s"}">${t.label}</button>`;
+  }).join("");
+  const opts = (sel, rows, label, cur) => {
+    const el = $(sel);
+    el.innerHTML = `<option value="">All ${label}</option>` + rows.map(r => `<option value="${esc(r.v)}"${r.v === cur ? " selected" : ""}>${esc(r.t)}</option>`).join("");
+    if (cur && !rows.some(r => r.v === cur)) el.innerHTML += `<option value="${esc(cur)}" selected>${esc(cur)}</option>`;
+  };
+  opts("#fArtist", tally(all, p => p.artist).map(e => ({ v: e.k, t: e.k, n: e.n })), "artists", f.artist);
+  opts("#fAlbum", tally(all.filter(p => p.album), albumKey).map(e => ({ v: e.k, t: `${e.p.album} · ${e.p.artist}`, n: e.n })), "albums", f.album);
+  opts("#fGenre", tally(all, p => genreOf(p) == null ? null : genreOf(p) || "?").map(e => ({ v: e.k, t: e.k === "?" ? "Unknown" : e.k, n: e.n })), "genres", f.genre);
+  opts("#fCountry", tally(all, p => countryOf(p) == null ? null : countryOf(p) || "?").map(e => ({ v: e.k, t: `${flag(e.k)} ${countryLabel(e.k === "?" ? "" : e.k)}`.trim(), n: e.n })), "countries", f.country);
+  $("#qClear").hidden = !f.q;
+  const n = activeFilters();
+  $("#filterCount").textContent = n ? `${n} on` : "";
+  $("#clearFilters").setAttribute("aria-disabled", !n);
+}
+
+function renderSelection(v) {
+  $("#selTitle").textContent = selTitle();
+  const unit = S.mode === "range" ? (rangeDays() === 1 ? "day" : `${rangeDays()} days`) : S.mode;
+  $("#selPrev").setAttribute("aria-label", "Previous " + unit);
+  $("#selNext").setAttribute("aria-label", "Next " + unit);
+  const [, b] = rangeOf(S.mode, S.anchor);
+  $("#selNext").setAttribute("aria-disabled", b > new Date());
+  const artists = new Set(v.map(p => p.artist)).size;
+  const n = activeFilters();
+  $("#selSub").textContent = S.error ? "Couldn't load this one" :
+    n ? `Showing ${v.length} of ${S.plays.length} scrobbles`
+      : `${S.mode === "range" ? rangeDays() + (rangeDays() === 1 ? " day · " : " days · ") : ""}${S.plays.length} scrobble${S.plays.length === 1 ? "" : "s"}`;
+  $("#shareBtn").setAttribute("aria-disabled", !v.length);
+  // Say which filters are on, right next to the results, with one tap to clear them
+  const desc = describeFilters();
+  $("#activeF").hidden = !desc || !!S.error;
+  $("#activeFText").textContent = desc;
+}
+
+function renderSummary(v) {
+  const el = $("#summary");
+  if (S.error) {
+    el.innerHTML = `<div class="empty"><b>That didn't work</b><p>${esc(S.error)}</p><button class="btn" id="retryBtn">Try again</button></div>`;
+    return;
+  }
+  if (S.loading && !S.plays.length) { el.innerHTML = `<div class="empty"><b>Digging through the crates…</b><p>Fetching your scrobbles from Last.fm.</p></div>`; return; }
+  if (!S.plays.length) {
+    el.innerHTML = `<div class="empty"><b>Nothing on the turntable</b><p>No scrobbles for ${spanWord()}. Days with a number in the calendar are days you listened. The greener the square, the more you played.</p></div>`;
+    return;
+  }
+  if (!v.length) {
+    el.innerHTML = `<div class="empty"><b>No matches</b><p>None of the ${S.plays.length} scrobbles fit these filters. Loosen one, or clear them all.</p><button class="btn" data-act="clear">Clear all filters</button></div>`;
+    return;
+  }
+  const arts = tally(v, p => p.artist), albs = tally(v.filter(p => p.album), albumKey), trks = tally(v, p => p.artist + "\u0001" + p.track);
+  // Rhythm: hours for a day, days for anything longer
+  let bars, axis;
+  const [ra, rb] = rangeOf(S.mode, S.anchor), short = d => fmt({ day: "numeric", month: "short" }, d);
+  if (S.mode === "day") {
+    bars = Array(24).fill(0); v.forEach(p => bars[new Date(p.ts * 1000).getHours()]++);
+    axis = ["Night", "Morning", "Afternoon", "Evening"];
+  } else {
+    const nd = Math.round((rb - ra) / 864e5); bars = Array(nd).fill(0);
+    v.forEach(p => { const i = Math.floor((sod(new Date(p.ts * 1000)) - ra) / 864e5 + .5); if (i >= 0 && i < nd) bars[i]++; });
+    axis = S.mode === "week" ? ["Mon", "Sun"] : [short(ra), short(addDays(rb, -1))];
+  }
+  const bmax = Math.max(...bars, 1), peak = bars.indexOf(Math.max(...bars));
+  const peakWhen = S.mode === "day" ? `around ${pad(peak)}:00` : S.mode === "week" ? `on ${fmt({ weekday: "long" }, addDays(ra, peak))}` : `on ${short(addDays(ra, peak))}`;
+  const top = arts[0], share = top.n / v.length;
+  const story = arts.length === 1 ? `All <b>${esc(top.k)}</b>, busiest ${peakWhen}.`
+    : share >= .3 ? `Mostly <b>${esc(top.k)}</b>, busiest ${peakWhen}.`
+    : `A good mix, led by <b>${esc(top.k)}</b>. Busiest ${peakWhen}.`;
+  // Highlights: three pictures, no numbers
+  const artOf = artist => v.find(p => p.artist === artist && p.art) || v.find(p => p.artist === artist);
+  const hlAlbum = albs[0], hlSong = trks[0];
+  const card = (label, inner) => `<div class="hl-card"><span class="hl-k">${label}</span>${inner}</div>`;
+  const hl = [
+    hlAlbum ? card("Top album", `<div class="album-wrap"><button class="album" data-act="album" data-v="${esc(hlAlbum.k)}" aria-pressed="${S.f.album === hlAlbum.k}" aria-label="Top album: ${esc(hlAlbum.p.album)} by ${esc(hlAlbum.p.artist)}. Show only this album.">${artHTML(hlAlbum.p)}<b>${esc(hlAlbum.p.album)}</b><span>${esc(hlAlbum.p.artist)}</span></button><span class="sq">${playLink(hlAlbum.p.artist, hlAlbum.p.album)}</span></div>`) : "",
+    card("Top artist", `<div class="album-wrap"><button class="album" data-act="artist" data-v="${esc(top.k)}" aria-pressed="${S.f.artist === top.k}" aria-label="Top artist: ${esc(top.k)}. Show only this artist.">${artHTML({ ...artOf(top.k), album: "" })}<b>${esc(top.k)}</b><span>${arts.length > 1 ? `then ${esc(arts[1].k)}` : "&nbsp;"}</span></button></div>`),
+    card("Top song", `<div class="album-wrap"><div class="album">${artHTML(hlSong.p)}<b>${esc(hlSong.p.track)}</b><span>${esc(hlSong.p.artist)}</span></div><span class="sq">${playLink(hlSong.p.artist, hlSong.p.track)}</span></div>`),
+  ].join("");
+  const amax = arts[0].n, tmax = trks[0].n;
+  const genreRows = tally(v, p => genreOf(p) || null).slice(0, 10);
+  const ctryRows = tally(v, p => countryOf(p) || null).slice(0, 10);
+  // Ranked lists: the bar shows "more or less", so no numbers next to it
+  const rank = (rows, max, name, sub, act, play) => `<ol class="rank">${rows.slice(0, 5).map((e, i) => `<li><span class="badge">${i + 1}</span>
+     <div class="rname"><b>${act ? `<button class="linkbtn" data-act="${act}" data-v="${esc(e.p.artist)}">${esc(name(e))}</button>` : esc(name(e))}</b>${sub ? `<span>${esc(sub(e))}</span>` : ""}<div class="meter" role="img" aria-label="${e.n} plays"><i style="width:${(e.n / max) * 100}%"></i></div></div>
+     ${play ? play(e) : ""}</li>`).join("")}</ol>`;
+  const more = S.more ? `
+   <div class="block"><h3>More albums</h3><div class="albums">${albs.slice(0, 6).map(e => `<div class="album-wrap"><button class="album" data-act="album" data-v="${esc(e.k)}" aria-pressed="${S.f.album === e.k}" aria-label="${esc(e.p.album)} by ${esc(e.p.artist)}, ${e.n} plays">
+      ${artHTML(e.p)}<b>${esc(e.p.album)}</b><span>${esc(e.p.artist)}</span></button><span class="sq">${playLink(e.p.artist, e.p.album)}</span></div>`).join("")}</div></div>
+   <div class="block cols">
+    <div><h3>Top artists</h3>${rank(arts, amax, e => e.k, null, "artist")}</div>
+    <div><h3>Top songs</h3>${rank(trks, tmax, e => e.p.track, e => e.p.artist, null, e => playLink(e.p.artist, e.p.track))}</div>
+   </div>
+   <div class="block cols">
+    <div><h3>Genres</h3>${genreRows.length ? `<div class="chips">${genreRows.map(e => `<button class="chip" data-act="genre" data-v="${esc(e.k)}" aria-pressed="${S.f.genre === e.k}">${esc(e.k)}</button>`).join("")}</div>` : `<p class="small muted">Still looking these up.</p>`}</div>
+    <div><h3>Countries</h3>${ctryRows.length ? `<div class="chips">${ctryRows.map(e => `<button class="chip" data-act="country" data-v="${esc(e.k)}" aria-pressed="${S.f.country === e.k}">${flag(e.k)} ${esc(countryLabel(e.k))}</button>`).join("")}</div>` : `<p class="small muted">Still looking these up.</p>`}</div>
+   </div>` : "";
+  el.innerHTML = `
+   <div class="panel-head"><h2>Summary</h2></div>
+   <p class="story">${story}</p>
+   <div class="hl">${hl}</div>
+   <div class="block"><h3>${S.mode === "day" ? "Through the day" : "Day by day"}</h3>
+    <div class="rhythm" role="img" aria-label="Scrobbles per ${S.mode === "day" ? "hour" : "day"}. Busiest ${esc(peakWhen)}.">${bars.map((b, i) => `<div class="bar" data-zero="${!b}" style="height:${(b / bmax) * 100}%"></div>`).join("")}</div>
+    <div class="raxis${S.mode === "day" ? " q" : ""}">${axis.map(a => `<span>${a}</span>`).join("")}</div></div>
+   ${more}
+   <button class="btn morebtn" id="moreBtn" aria-expanded="${!!S.more}">${S.more ? "Show less" : "Show more: artists, songs, genres"}</button>`;
+}
+
+function renderTimeline(v) {
+  const el = $("#timeline");
+  $("#timelinePanel").hidden = !v.length;
+  if (!v.length) { el.innerHTML = ""; return; }
+  $("#tlNote").textContent = "";
+  const LIMIT = 250, list = S.showAll ? v : v.slice(0, LIMIT);
+  const groups = [];
+  for (const p of list) {
+    const d = new Date(p.ts * 1000);
+    const gk = S.mode === "day" ? todOf(d.getHours()) : dkey(d);
+    if (!groups.length || groups[groups.length - 1].k !== gk) groups.push({ k: gk, d, items: [] });
+    groups[groups.length - 1].items.push(p);
+  }
+  const totals = tally(v, p => S.mode === "day" ? todOf(new Date(p.ts * 1000).getHours()) : dkey(new Date(p.ts * 1000)));
+  const totalOf = k => (totals.find(e => e.k === k) || { n: 0 }).n;
+  el.innerHTML = groups.map(g => `<div class="tl-group"><div class="tl-head"><span class="pill">${S.mode === "day" ? TOD.find(t => t.id === g.k).label : esc(fmt({ weekday: "short", day: "numeric", month: "short" }, g.d))}</span><span class="rule"></span></div>
+     <ul class="tl">${g.items.map(p => `<li><time datetime="${new Date(p.ts * 1000).toISOString()}">${fTime(new Date(p.ts * 1000))}</time>${artHTML(p)}<div class="t"><b>${esc(p.track)}</b><span><button class="linkbtn" data-act="artist" data-v="${esc(p.artist)}">${esc(p.artist)}</button></span></div>${playLink(p.artist, p.track)}</li>`).join("")}</ul></div>`).join("")
+    + (v.length > list.length ? `<button class="btn more" data-act="more">Show all ${v.length} plays</button>` : "");
+}
+
+function render() {
+  const v = view();
+  renderSelection(v); renderFilters(); renderSummary(v); renderTimeline(v);
+  $("#otdPanel").hidden = S.mode !== "day" || !$("#otd").children.length;
+}
+let rTimer; function renderSoon() { clearTimeout(rTimer); rTimer = setTimeout(render, 350); }
+
+/* ════════ On this day ════════ */
+let otdGen = 0;
+async function loadOTD() {
+  const g = ++otdGen, el = $("#otd");
+  el.innerHTML = ""; $("#otdNote").textContent = "";
+  if (S.mode !== "day" || !S.registered) { $("#otdPanel").hidden = true; return; }
+  const a = S.anchor, years = [];
+  for (let y = a.getFullYear() - 1; y >= S.registered.getFullYear(); y--) {
+    const d = new Date(y, a.getMonth(), a.getDate());
+    if (d.getMonth() !== a.getMonth()) continue; // 29 February
+    if (addDays(d, 1) <= S.registered) continue;
+    years.push(d);
+  }
+  if (!years.length) { $("#otdPanel").hidden = true; return; }
+  $("#otdPanel").hidden = false;
+  $("#otdNote").textContent = `${fmt({ day: "numeric", month: "long" }, a)} in earlier years`;
+  el.dataset.all = "false";
+  el.innerHTML = years.map((d, i) => `<button data-k="${dkey(d)}" data-extra="${i >= 6}" aria-label="${d.getFullYear()}, loading"><span class="yr">${d.getFullYear()}</span><span class="meta">Loading…</span></button>`).join("");
+  $("#otdMore").hidden = years.length <= 6;
+  $("#otdMore").textContent = `Show all ${years.length} years`;
+  await pool(years, 2, async d => {
+    if (g !== otdGen) return;
+    let plays;
+    try { plays = await getPlays(d, addDays(d, 1)); } catch { plays = null; }
+    if (g !== otdGen) return;
+    const b = el.querySelector(`[data-k="${dkey(d)}"]`); if (!b) return;
+    if (!plays) { b.querySelector(".meta").textContent = "Couldn't load"; return; }
+    counts[dkey(d)] = plays.length;
+    if (!plays.length) { b.dataset.empty = "true"; b.innerHTML = `<span class="yr">${d.getFullYear()}</span><span class="meta"><b>Quiet day</b></span>`; b.setAttribute("aria-label", `${d.getFullYear()}, no scrobbles`); return; }
+    const top = tally(plays, p => p.artist)[0], alb = tally(plays.filter(p => p.album), albumKey)[0];
+    b.innerHTML = `<span class="yr">${d.getFullYear()}</span>${artHTML(alb ? alb.p : top.p)}<span class="meta"><b>${esc(top.k)}</b></span>`;
+    b.setAttribute("aria-label", `${d.getFullYear()}: ${plays.length} plays, mostly ${top.k}. Open this day.`);
+  });
+}
+
+/* ════════ Loading ════════ */
+async function getPlays(a, b, onp) {
+  const k = `${userSlot()}|${unix(a)}|${unix(b)}`;
+  if (playCache.has(k)) return playCache.get(k);
+  const plays = await src().plays(unix(a), unix(b) - 1, onp);
+  if (b.getTime() < Date.now() - 864e5) playCache.set(k, plays);
+  return plays;
+}
+
+async function load() {
+  const g = ++S.gen, [a, b] = rangeOf(S.mode, S.anchor);
+  S.error = null; S.loading = true; S.plays = []; S.showAll = false;
+  writeHash(); render(); renderCalendar();
+  status(S.mode === "day" ? "Dropping the needle on that day…" : S.mode === "range" ? `Fetching ${spanWord()}…` : `Fetching the whole ${S.mode}…`, "busy");
+  progress(0);
+  let plays;
+  try { plays = await getPlays(a, b, f => g === S.gen && progress(f)); }
+  catch (e) {
+    if (g !== S.gen) return;
+    S.loading = false; S.error = explain(e); progress(null); status(S.error, "warn"); render(); return;
+  }
+  if (g !== S.gen) return;
+  S.loading = false; S.plays = plays; progress(null);
+  // A loaded range tells us the exact count for each of its days
+  for (let d = a; d < b; d = addDays(d, 1)) if (d <= new Date()) counts[dkey(d)] = 0;
+  plays.forEach(p => { const k = dkey(new Date(p.ts * 1000)); counts[k] = (counts[k] || 0) + 1; });
+  // Drop picks that don't exist in this range; keep search and time of day
+  const f = S.f;
+  if (f.artist && !plays.some(p => p.artist === f.artist)) f.artist = "";
+  if (f.album && !plays.some(p => albumKey(p) === f.album)) f.album = "";
+  renderCalendar(); saveSoon(); render();
+  const arts = new Set(plays.map(p => p.artist)).size;
+  status(plays.length ? `Found ${plays.length} scrobble${plays.length === 1 ? "" : "s"}.` :
+    `Nothing scrobbled ${spanWord()}. Try a green square in the calendar.`, "ok");
+  Enrich.start(plays);
+  loadOTD();
+}
+
+/* ════════ Navigation ════════ */
+function select(date, mode = S.mode) {
+  const today = sod(new Date());
+  if (rangeOf(mode, date)[0] > today) { status("That's still in the future. Nothing scrobbled there yet.", "warn"); return; }
+  S.mode = mode; S.anchor = sod(date > today ? today : date);
+  if (mode === "range") { S.range ||= lastDays(14); S.anchor = sod(S.range.from); }
+  else S.pickStart = null;
+  const [a] = rangeOf(S.mode, S.anchor);
+  const showM = S.mode === "range" ? S.range.to : S.anchor;
+  const nm = new Date(showM.getFullYear(), showM.getMonth(), 1);
+  const monthChanged = +nm !== +S.month; S.month = nm;
+  store.set("mode", S.mode);
+  renderRangeBox();
+  $$(".seg button[data-mode]").forEach(b => b.setAttribute("aria-selected", b.dataset.mode === S.mode));
+  load();
+  if (monthChanged) fillCounts();
+}
+const oneColumn = () => matchMedia("(max-width:860px)").matches;
+const smooth = () => (matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth");
+function revealSelection() {
+  if (oneColumn()) $("#selPanel").scrollIntoView({ behavior: smooth(), block: "start" });
+  else scrollTo({ top: 0, behavior: smooth() });
+}
+function setRange(from, to) {
+  if (from > to) [from, to] = [to, from];
+  const today = sod(new Date());
+  if (to > today) to = today;
+  if (daysBetween(from, to) + 1 > MAX_RANGE_DAYS) {
+    status(`That's ${daysBetween(from, to) + 1} days. Pick up to ${MAX_RANGE_DAYS} days so it stays quick.`, "warn"); return false;
+  }
+  S.range = { from: sod(from), to: sod(to) }; S.pickStart = null;
+  select(S.range.from, "range"); return true;
+}
+function renderRangeBox() {
+  $("#rangeBox").hidden = S.mode !== "range";
+  if (S.mode !== "range") return;
+  const r = S.range, today = sod(new Date()), short = d => fmt({ day: "numeric", month: "short" }, d);
+  $$("#rangeBox [data-preset]").forEach(b => b.setAttribute("aria-pressed",
+    !S.pickStart && !!r && +r.to === +today && daysBetween(r.from, r.to) + 1 === +b.dataset.preset));
+  $("#rangeHint").innerHTML = S.pickStart
+    ? `Starts <b>${short(S.pickStart)}</b>. Now tap the last day.`
+    : `Or tap a start day, then an end day in the calendar.`;
+}
+function step(dir) {
+  if (S.mode === "range") {
+    const n = daysBetween(S.range.from, S.range.to) + 1;
+    const from = addDays(S.range.from, n * dir), to = addDays(S.range.to, n * dir);
+    if (from > sod(new Date())) { status("That's still in the future. Nothing scrobbled there yet.", "warn"); return; }
+    setRange(from, to); return;
+  }
+  const a = S.anchor;
+  const next = S.mode === "day" ? addDays(a, dir) : S.mode === "week" ? addDays(a, 7 * dir) : new Date(a.getFullYear(), a.getMonth() + dir, 1); select(next);
+}
+function writeHash() { const h = S.mode === "range" ? `#range/${dkey(S.range.from)}/${dkey(S.range.to)}` : `#${S.mode}/${dkey(S.anchor)}`; if (location.hash !== h) history.replaceState(null, "", h); }
+function readHash() {
+  const r = /^#range\/(\d{4}-\d{2}-\d{2})\/(\d{4}-\d{2}-\d{2})$/.exec(location.hash);
+  if (r) {
+    let from = parseKey(r[1]), to = parseKey(r[2]); const today = sod(new Date());
+    if (from > to) [from, to] = [to, from];
+    if (to > today) to = today;
+    if (from > to) from = to;
+    if (daysBetween(from, to) + 1 > MAX_RANGE_DAYS) from = addDays(to, -(MAX_RANGE_DAYS - 1));
+    S.mode = "range"; S.range = { from, to }; S.anchor = from; S.month = new Date(to.getFullYear(), to.getMonth(), 1); return;
+  }
+  const m = /^#(day|week|month)\/(\d{4}-\d{2}-\d{2})$/.exec(location.hash);
+  if (m) { S.mode = m[1]; S.anchor = parseKey(m[2]); if (S.anchor > sod(new Date())) S.anchor = sod(new Date()); S.month = new Date(S.anchor.getFullYear(), S.anchor.getMonth(), 1); }
+}
+
+/* ════════ Share card (1080 × 2340, iPhone 12 mini native) ════════ */
+const CARD_THEMES = [
+  { id: "red", name: "Red", bg: "#e60012", card: "#fffaf2", ink: "#1c1b1a", ink2: "#6b6760", hi: "#e60012", on: "#ffffff", bar: "#e60012" , head: "#ffffff" },
+  { id: "blue", name: "Blue", bg: "#00a2e8", card: "#fffaf2", ink: "#1c1b1a", ink2: "#6b6760", hi: "#0067b8", on: "#ffffff", bar: "#00a2e8" , head: "#ffffff" },
+  { id: "yellow", name: "Yellow", bg: "#ffd23f", card: "#1c1b1a", ink: "#fffaf2", ink2: "#bdb8ae", hi: "#ffd23f", on: "#1c1b1a", bar: "#ffd23f" , head: "#1c1b1a" },
+  { id: "ink", name: "Night", bg: "#1c1b1a", card: "#2a2b31", ink: "#fffaf2", ink2: "#b4b0a8", hi: "#ff4655", on: "#1c1b1a", bar: "#ff4655" , head: "#fffaf2" },
+];
+const TILE_HEX = ["#ffd23f", "#4cc3ff", "#86dc72", "#ff94c8", "#bba4ff"];
+let cardTheme = store.get("cardTheme", "red"), cardURL = null, cardBlob = null;
+const loadImg = url => new Promise(res => {
+  if (!url) return res(null);
+  const i = new Image(); i.crossOrigin = "anonymous"; i.referrerPolicy = "no-referrer";
+  i.onload = () => res(i); i.onerror = () => res(null); i.src = url;
+  setTimeout(() => res(null), 6000);
+});
+function rrect(c, x, y, w, h, r) { c.beginPath(); c.roundRect ? c.roundRect(x, y, w, h, r) : c.rect(x, y, w, h); }
+function fitText(c, s, max) { if (c.measureText(s).width <= max) return s; while (s.length > 1 && c.measureText(s + "…").width > max) s = s.slice(0, -1); return s.trimEnd() + "…"; }
+
+async function drawCard() {
+  const T = CARD_THEMES.find(t => t.id === cardTheme) || CARD_THEMES[0];
+  const v = view(), W = 1080, H = 2340;
+  const F = getComputedStyle(document.body).fontFamily;
+  try { await document.fonts.load(`800 40px "Atkinson Hyperlegible Next"`); await document.fonts.load(`400 40px "Atkinson Hyperlegible Next"`); } catch {}
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const c = cv.getContext("2d");
+  const font = (w, s) => c.font = `${w} ${s}px ${F}`;
+  // Background with a few chunky dots for fun
+  c.fillStyle = T.bg; c.fillRect(0, 0, W, H);
+  c.globalAlpha = .12; c.fillStyle = T.card;
+  for (let i = 0; i < 26; i++) { c.beginPath(); c.arc((i * 263) % W, 60 + ((i * 397) % (H - 120)), 10 + (i % 4) * 8, 0, 7); c.fill(); }
+  c.globalAlpha = 1;
+  // Top label (kept below the phone's status bar)
+  font(900, 44); c.fillStyle = T.head; c.textBaseline = "alphabetic";
+  c.fillText("PAST.FM", 84, 210);
+  font(800, 36); c.textAlign = "right"; c.fillText("@" + (S.demo ? "sample" : S.user), W - 84, 210); c.textAlign = "left";
+  // The card
+  const X = 60, Y = 260, CW = W - 120, CH = 1860;
+  c.fillStyle = "rgba(0,0,0,.22)"; rrect(c, X, Y + 16, CW, CH, 56); c.fill();
+  c.fillStyle = T.card; rrect(c, X, Y, CW, CH, 56); c.fill();
+  const L = X + 64, R = X + CW - 64, IW = R - L;
+  // Date
+  const [a, b] = rangeOf(S.mode, S.anchor);
+  const kicker = S.mode === "day" ? fmt({ weekday: "long" }, a) : S.mode === "week" ? "My week" : S.mode === "range" ? (rangeDays() === 1 ? "My day" : `My ${rangeDays()} days`) : "My month";
+  const big = S.mode === "day" ? fmt({ day: "numeric", month: "short", year: "numeric" }, a) : S.mode === "month" ? fmt({ month: "long", year: "numeric" }, a) : selTitle();
+  font(800, 40); c.fillStyle = T.ink2; c.fillText(kicker.toUpperCase(), L, Y + 112);
+  font(900, S.mode === "week" || S.mode === "range" ? 74 : 92); c.fillStyle = T.ink; c.fillText(fitText(c, big, IW), L, Y + 212);
+  // Count pill
+  const nTxt = String(v.length);
+  font(900, 150); const nW = c.measureText(nTxt).width;
+  c.fillStyle = T.hi; c.fillText(nTxt, L - 4, Y + 380);
+  font(800, 44); c.fillStyle = T.ink; c.fillText(v.length === 1 ? "scrobble" : "scrobbles", L + nW + 18, Y + 378);
+  const filt = describeFilters();
+  if (filt) { font(700, 32); c.fillStyle = T.ink2; c.fillText(fitText(c, "Only " + filt, IW), L, Y + 440); }
+  // Top three albums in a row, each with a play-count sticker
+  const albs = tally(v.filter(p => p.album), albumKey).slice(0, 3);
+  const gy = Y + 480, gap = 24, tile = (IW - gap * 2) / 3;
+  const imgs = await Promise.all(albs.map(e => loadImg(e.p.art)));
+  for (let i = 0; i < 3; i++) {
+    const x = L + i * (tile + gap), e = albs[i];
+    c.save(); c.translate(x + tile / 2, gy + tile / 2); c.rotate([-.03, .02, -.015][i]); c.translate(-tile / 2, -tile / 2);
+    c.save(); rrect(c, 0, 0, tile, tile, 26); c.clip();
+    if (e && imgs[i]) c.drawImage(imgs[i], 0, 0, tile, tile);
+    else {
+      const s = e ? (e.p.album || e.p.artist) : ""; let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+      c.fillStyle = e ? TILE_HEX[h % 5] : T.ink2; c.globalAlpha = e ? 1 : .15; c.fillRect(0, 0, tile, tile); c.globalAlpha = 1;
+      if (e) { font(900, 84); c.fillStyle = "#1c1b1a"; c.textAlign = "center"; c.fillText(initials(s), tile / 2, tile / 2 + 30); c.textAlign = "left"; }
+    }
+    c.restore();
+    if (e) {
+      font(900, 32); const t = e.n + "×", tw = c.measureText(t).width + 30;
+      c.translate(-10, -14); c.rotate(-.08);
+      c.fillStyle = T.card; rrect(c, 0, 0, tw, 52, 26); c.fill(); c.lineWidth = 4; c.strokeStyle = T.ink; c.stroke();
+      c.fillStyle = T.ink; c.fillText(t, 15, 37);
+    }
+    c.restore();
+  }
+  // Top artist
+  let y = gy + tile + 100;
+  const arts = tally(v, p => p.artist);
+  font(800, 32); c.fillStyle = T.ink2; c.fillText("TOP ARTIST", L, y);
+  font(900, 62); c.fillStyle = T.ink; c.fillText(fitText(c, arts[0] ? arts[0].k : "—", IW), L, y + 68);
+  // Top songs
+  y += 150;
+  font(800, 32); c.fillStyle = T.ink2; c.fillText("TOP SONGS", L, y);
+  const trks = tally(v, p => p.artist + "\u0001" + p.track).slice(0, 5);
+  trks.forEach((e, i) => {
+    const ry = y + 30 + i * 90;
+    c.fillStyle = i === 0 ? T.hi : T.ink2; c.globalAlpha = i === 0 ? 1 : .18; rrect(c, L, ry, 62, 62, 18); c.fill(); c.globalAlpha = 1;
+    font(900, 32); c.fillStyle = i === 0 ? T.on : T.ink; c.textAlign = "center"; c.fillText(String(i + 1), L + 31, ry + 43); c.textAlign = "left";
+    font(800, 36); c.fillStyle = T.ink; c.fillText(fitText(c, e.p.track, IW - 200), L + 88, ry + 30);
+    font(700, 29); c.fillStyle = T.ink2; c.fillText(fitText(c, e.p.artist, IW - 200), L + 88, ry + 64);
+    font(900, 32); c.fillStyle = T.ink2; c.textAlign = "right"; c.fillText(e.n + "×", R, ry + 43); c.textAlign = "left";
+  });
+  // Rhythm bars
+  y += 30 + 5 * 90 + 50;
+  font(800, 32); c.fillStyle = T.ink2; c.fillText(S.mode === "day" ? "THROUGH THE DAY" : S.mode === "week" ? "THROUGH THE WEEK" : S.mode === "range" ? "DAY BY DAY" : "THROUGH THE MONTH", L, y);
+  y += 24;
+  let bars;
+  if (S.mode === "day") { bars = Array(24).fill(0); v.forEach(p => bars[new Date(p.ts * 1000).getHours()]++); }
+  else { const nd = Math.round((b - a) / 864e5); bars = Array(nd).fill(0); v.forEach(p => { const i = Math.floor((sod(new Date(p.ts * 1000)) - a) / 864e5 + .5); if (i >= 0 && i < nd) bars[i]++; }); }
+  const bh = 130, bw = IW / bars.length, bmax = Math.max(...bars, 1);
+  bars.forEach((n, i) => {
+    const h = n ? Math.max(10, (n / bmax) * bh) : 6;
+    c.fillStyle = n ? T.bar : T.ink2; c.globalAlpha = n ? 1 : .2;
+    rrect(c, L + i * bw + bw * .14, y + bh - h, bw * .72, h, Math.min(10, bw * .3)); c.fill(); c.globalAlpha = 1;
+  });
+  font(700, 26); c.fillStyle = T.ink2;
+  const ax = S.mode === "day" ? ["00", "06", "12", "18", "23"] : S.mode === "week" ? ["Mon", "Sun"]
+    : S.mode === "range" ? [fmt({ day: "numeric", month: "short" }, a), fmt({ day: "numeric", month: "short" }, addDays(b, -1))] : ["1", String(bars.length)];
+  ax.forEach((t, i) => { c.textAlign = i === 0 ? "left" : i === ax.length - 1 ? "right" : "center"; c.fillText(t, L + (IW * i) / (ax.length - 1), y + bh + 38); });
+  c.textAlign = "left";
+  // Genre pills
+  y += bh + 120;
+  const gs = tally(v, p => genreOf(p) || null).slice(0, 3);
+  let gx = L; font(800, 31);
+  for (const e of gs) {
+    const w = c.measureText(e.k).width + 48; if (gx + w > R) break;
+    c.lineWidth = 4; c.strokeStyle = T.ink; rrect(c, gx, y - 45, w, 64, 32); c.stroke();
+    c.fillStyle = T.ink; c.fillText(e.k, gx + 24, y);
+    gx += w + 14;
+  }
+  // Footer (kept above the home indicator)
+  font(800, 32); c.fillStyle = T.head; c.textAlign = "center";
+  c.fillText(S.demo ? "made with past.fm" : `last.fm/user/${S.user}`, W / 2, H - 118);
+  c.textAlign = "left";
+  return new Promise(res => cv.toBlob(res, "image/png"));
+}
+function describeFilters() {
+  const f = S.f, bits = [];
+  if (f.tod.size) bits.push(TOD.filter(t => f.tod.has(t.id)).map(t => t.label.toLowerCase()).join(" + "));
+  if (f.artist) bits.push(f.artist);
+  if (f.album) bits.push(f.album.split("\u0001")[1]);
+  if (f.genre) bits.push(f.genre === "?" ? "unknown genre" : f.genre);
+  if (f.country) bits.push(countryLabel(f.country === "?" ? "" : f.country));
+  if (f.q) bits.push(`"${f.q}"`);
+  return bits.join(" · ");
+}
+async function openShare() {
+  if (!view().length) { status("There's nothing to put on a card yet. Pick a day with scrobbles first.", "warn"); return; }
+  const dlg = $("#shareDlg");
+  $("#swatches").innerHTML = `<span class="flabel" style="margin:0 6px 0 0">Colour</span>` +
+    CARD_THEMES.map(t => `<button class="sw" data-card="${t.id}" aria-pressed="${t.id === cardTheme}" aria-label="${t.name}" title="${t.name}" style="background:${t.bg}"></button>`).join("");
+  if (!dlg.open) dlg.showModal();
+  await refreshCard();
+}
+async function refreshCard() {
+  $("#cardImg").style.opacity = .4;
+  let blob;
+  try { blob = await drawCard(); } catch { blob = null; }
+  if (!blob) { status("Couldn't draw the card. Press Make a day card again.", "warn"); return; }
+  cardBlob = blob;
+  if (cardURL) URL.revokeObjectURL(cardURL);
+  cardURL = URL.createObjectURL(blob);
+  $("#cardImg").src = cardURL; $("#cardImg").style.opacity = 1;
+  const name = `past-fm-${S.mode}-${dkey(rangeOf(S.mode, S.anchor)[0])}.png`;
+  $("#cardSave").href = cardURL; $("#cardSave").download = name;
+  const file = new File([blob], name, { type: "image/png" });
+  $("#shareNative").hidden = !(navigator.canShare && navigator.canShare({ files: [file] }));
+  $("#shareNative").onclick = () => navigator.share({ files: [file], title: "past.fm" }).catch(() => {});
+}
+
+/* ════════ Settings & theme ════════ */
+function applyTheme() {
+  const r = document.documentElement;
+  if (S.theme === "system") r.removeAttribute("data-theme"); else r.dataset.theme = S.theme;
+  const label = { system: "follow the system", light: "light", dark: "dark" }[S.theme];
+  $("#themeBtn").setAttribute("aria-label", "Theme: " + label); $("#themeBtn").title = "Theme: " + label;
+}
+function showSetup(cancellable) {
+  $("#setup").hidden = false; $("#app").hidden = true;
+  $("#cancelSetup").hidden = !cancellable;
+  $("#setupTitle").textContent = cancellable ? "Settings" : "Connect to Last.fm";
+  $("#cancelSetup").textContent = "Back";
+  $("#saveBtn").textContent = cancellable ? "Save account" : "Start listening back";
+  renderPlayPref();
+  $("#userIn").value = S.user || "djmitchel"; $("#keyIn").value = S.key || "";
+  $("#keyIn").focus();
+}
+async function start() {
+  $("#setup").hidden = true; $("#app").hidden = false;
+  $("#userLabel").textContent = S.demo ? "Sample data" : S.user;
+  counts = store.get("counts." + userSlot(), {});
+  genres = S.demo ? {} : store.get("genres2", {});
+  countries = S.demo ? {} : store.get("countries", {});
+  $("#filtersBox").open = matchMedia("(min-width:861px)").matches;
+  $$(".seg button[data-mode]").forEach(b => b.setAttribute("aria-selected", b.dataset.mode === S.mode));
+  renderRangeBox();
+  renderCalendar();
+  try { S.registered = (await src().info()).registered; }
+  catch (e) { S.registered = null; if (e instanceof ApiError && (e.code === 6 || e.code === 10 || e.code === 26)) { status(explain(e), "warn"); showSetup(true); $("#setupNote").textContent = explain(e); return; } }
+  load(); fillCounts();
+}
+
+/* ════════ Events ════════ */
+// Broken cover art turns into a coloured tile with initials instead of an empty box
+document.addEventListener("error", e => {
+  const i = e.target;
+  if (!(i instanceof HTMLImageElement) || !i.dataset.ph) return;
+  const sp = document.createElement("span");
+  sp.className = i.className + " ph"; sp.textContent = i.dataset.ph; sp.style.background = `var(${i.dataset.tile})`;
+  i.replaceWith(sp);
+}, true);
+document.addEventListener("click", e => {
+  const t = e.target.closest("button,a"); if (!t || t.classList.contains("play")) return;
+  if (t.matches("[aria-disabled=true]") && !t.matches(".day")) {
+    if (t.id === "clearFilters") status("No filters are on right now.", "");
+    else if (t.id === "shareBtn") openShare();
+    else if (t.id === "selNext" || t.id === "calNext") { status("That's still in the future. Nothing scrobbled there yet.", "warn"); }
+    return;
+  }
+  if (t.matches(".day:not(.blank)")) {
+    if (t.dataset.future === "true") { status("That day hasn't happened yet.", "warn"); return; }
+    const d = parseKey(t.dataset.k);
+    if (S.mode === "range") {
+      // Two taps: first day, then last day
+      if (!S.pickStart) { S.pickStart = d; renderCalendar(); renderRangeBox(); status("Now tap the last day.", ""); return; }
+      if (setRange(S.pickStart, d) && oneColumn()) revealSelection();
+      return;
+    }
+    select(d); if (oneColumn()) revealSelection(); return;
+  }
+  if (t.dataset.listen) {
+    S.listen = t.dataset.listen; store.set("listen2", S.listen); renderPlayPref();
+    if (!$("#app").hidden || S.plays.length) render();
+    status(`Saved. ▶ buttons now open ${SERVICES[S.listen].name}.`, "ok"); return;
+  }
+  if (t.dataset.preset) { setRange(addDays(sod(new Date()), -(+t.dataset.preset - 1)), new Date()); if (oneColumn()) revealSelection(); return; }
+  if (t.closest(".seg")) {
+    // Range keeps the current day as its last day if it was a past day, otherwise the last 2 weeks
+    if (t.dataset.mode === "range" && S.mode !== "range" && !S.range) S.range = lastDays(14);
+    select(S.mode === "range" && t.dataset.mode !== "range" ? S.range.to : S.anchor, t.dataset.mode); return;
+  }
+  if (t.closest("#otd") && t.dataset.k) { select(parseKey(t.dataset.k), "day"); revealSelection(); return; }
+  if (t.dataset.tod) { S.f.tod.has(t.dataset.tod) ? S.f.tod.delete(t.dataset.tod) : S.f.tod.add(t.dataset.tod); render(); return; }
+  if (t.dataset.card) { cardTheme = t.dataset.card; store.set("cardTheme", cardTheme); $$(".sw").forEach(s => s.setAttribute("aria-pressed", s.dataset.card === cardTheme)); refreshCard(); return; }
+  const act = t.dataset.act;
+  if (act) {
+    if (act === "clear") clearFilters();
+    else if (act === "more") { S.showAll = true; render(); }
+    else { S.f[act] = S.f[act] === t.dataset.v ? "" : t.dataset.v; render(); }
+    return;
+  }
+  if (t.id === "homeLink") { e.preventDefault(); goHome(); return; }
+  switch (t.id) {
+    case "calPrev": S.month = new Date(S.month.getFullYear(), S.month.getMonth() - 1, 1); renderCalendar(); fillCounts(); break;
+    case "calNext": S.month = new Date(S.month.getFullYear(), S.month.getMonth() + 1, 1); renderCalendar(); fillCounts(); break;
+    case "todayBtn": select(new Date()); if (oneColumn()) revealSelection(); break;
+    case "clearF2": clearFilters(); break;
+    case "calJump": $("#calPanel").scrollIntoView({ behavior: smooth(), block: "start" }); break;
+    case "selPrev": step(-1); break;
+    case "selNext": step(1); break;
+    case "shareBtn": openShare(); break;
+    case "shareClose": $("#shareDlg").close(); break;
+    case "clearFilters": clearFilters(); break;
+    case "retryBtn": load(); break;
+    case "moreBtn": S.more = !S.more; store.set("more", S.more); render(); if (!S.more) $("#summary").scrollIntoView({ behavior: smooth(), block: "start" }); break;
+    case "otdMore": $("#otd").dataset.all = "true"; t.hidden = true; break;
+    case "qClear": S.f.q = ""; $("#q").value = ""; render(); $("#q").focus(); break;
+    case "themeBtn": S.theme = { system: "light", light: "dark", dark: "system" }[S.theme]; store.set("theme", S.theme); applyTheme();
+      status({ system: "Theme follows your Mac now.", light: "Light theme on.", dark: "Dark theme on." }[S.theme]); break;
+    case "settingsBtn": showSetup(true); break;
+    case "cancelSetup": $("#setup").hidden = true; $("#app").hidden = false; break;
+    case "demoBtn": S.demo = true; S.user = S.user || "djmitchel"; start(); break;
+    case "saveBtn": {
+      const u = $("#userIn").value.trim(), k = $("#keyIn").value.trim();
+      if (!u) { $("#setupNote").textContent = "Add your Last.fm username first."; $("#userIn").focus(); return; }
+      if (!/^[0-9a-f]{32}$/i.test(k)) { $("#setupNote").textContent = "The API key should be 32 letters and numbers. Copy the API key, not the shared secret."; $("#keyIn").focus(); return; }
+      if (u.toLowerCase() !== (S.user || "").toLowerCase()) { playCache.clear(); }
+      S.user = u; S.key = k; S.demo = false; store.set("user", u); store.set("key", k);
+      $("#setupNote").textContent = ""; start(); break;
+    }
+  }
+});
+for (const id of ["#userIn", "#keyIn"]) $(id).addEventListener("keydown", e => { if (e.key === "Enter") $("#saveBtn").click(); });
+// Show the "Pick a day" button once the calendar is out of view
+if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => {
+  $("#calJump").hidden = e.isIntersecting || $("#app").hidden;
+}).observe($("#calPanel"));
+// Home: today, day view, no filters, top of the page. From Settings it goes back to the app.
+function goHome() {
+  if (!S.demo && !(S.user && S.key)) { showSetup(false); return; }
+  const wasSetup = !$("#app").hidden ? false : true;
+  if (wasSetup) { $("#setup").hidden = true; $("#app").hidden = false; }
+  S.f = { q: "", tod: new Set(), artist: "", album: "", genre: "", country: "" }; $("#q").value = "";
+  select(new Date(), "day");
+  scrollTo({ top: 0, behavior: smooth() });
+  status("Back to today.", "ok");
+}
+// The sidebar's scroll area must end at the bottom of the window. Its top moves while the header
+// scrolls away, so size it to the space actually left below it (CSS alone can't know that).
+let fitQueued = false;
+function fitAside() {
+  fitQueued = false;
+  const a = $(".aside");
+  if (!a || $("#app").hidden || oneColumn()) { if (a) a.style.maxHeight = ""; return; }
+  const top = Math.max(18, a.getBoundingClientRect().top + 4);   // +4: the sidebar's own top padding
+  a.style.maxHeight = Math.max(200, innerHeight - top - 14) + "px";
+}
+const queueFit = () => { if (!fitQueued) { fitQueued = true; requestAnimationFrame(fitAside); } };
+addEventListener("scroll", queueFit, { passive: true });
+addEventListener("resize", queueFit);
+$("#filtersBox").addEventListener("toggle", queueFit);
+new MutationObserver(queueFit).observe($("#app"), { attributes: true, attributeFilter: ["hidden"] });
+function clearFilters() { S.f = { q: "", tod: new Set(), artist: "", album: "", genre: "", country: "" }; $("#q").value = ""; render(); }
+let qTimer;
+$("#q").addEventListener("input", e => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.f.q = e.target.value.trim(); render(); }, 150); });
+for (const [id, key] of [["#fArtist", "artist"], ["#fAlbum", "album"], ["#fGenre", "genre"], ["#fCountry", "country"]])
+  $(id).addEventListener("change", e => { S.f[key] = e.target.value; render(); });
+$("#shareDlg").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+document.addEventListener("keydown", e => {
+  if ($("#app").hidden || $("#shareDlg").open || e.target.closest("input,select,textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); const [, b] = rangeOf(S.mode, S.anchor); if (b <= new Date()) step(1); else { status("That's still in the future.", "warn"); } }
+  else if (e.key === "t" || e.key === "T") { select(new Date()); }
+});
+// Keep "today" honest if the page stays open past midnight, and refresh today's count now and then
+setInterval(async () => {
+  if ($("#app").hidden || S.loading) return;
+  const today = sod(new Date()), k = dkey(today);
+  let n;
+  try { n = await src().count(unix(today), unix(addDays(today, 1)) - 1); } catch { return; }
+  if (counts[k] === n) return;
+  counts[k] = n; renderCalendar();
+  // If today is on screen, quietly fetch the new plays so the list matches the calendar
+  const [a, b] = rangeOf(S.mode, S.anchor);
+  if (!(a <= today && today < b) || S.error || S.loading) return;
+  const g = S.gen;
+  try {
+    const plays = await getPlays(a, b);
+    if (g !== S.gen || plays.length === S.plays.length) return;
+    S.plays = plays; render(); Enrich.start(plays);
+    status(`Updated: ${plays.length} scrobble${plays.length === 1 ? "" : "s"} so far.`, "ok");
+  } catch {}
+}, 5 * 60 * 1000);
+
+/* ════════ Boot ════════ */
+applyTheme(); readHash();
+if (S.mode === "range" && !S.range) { S.range = lastDays(14); S.anchor = S.range.from; }
+if (new URLSearchParams(location.search).has("demo")) { S.demo = true; start(); }
+else if (S.user && S.key) start();
+else showSetup(false);
+</script>
+</body>
+</html>
